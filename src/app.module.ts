@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TextStreamController } from './text-stream/text-stream.controller';
+import { TextStreamModule } from './text-stream/text-stream.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController, TextStreamController],
+  imports: [TextStreamModule],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
