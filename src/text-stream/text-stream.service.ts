@@ -1,21 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTextStreamDto } from './dto/create-text-stream.dto';
 import { UpdateTextStreamDto } from './dto/update-text-stream.dto';
-import { interval, map } from 'rxjs';
+import { Observable, interval, map, pipe } from 'rxjs';
+import { askTextStreamDto } from './dto/ask-text-stream.dto';
+import { askGemini } from './core/googleGemini';
 
 @Injectable()
 export class TextStreamService {
-  askService() {
-    return interval(1000).pipe(
-      map((_) => ({ data: { hello: 'world' } }) as MessageEvent),
-    );
-  }
-  create(createTextStreamDto: CreateTextStreamDto) {
-    return 'This action adds a new textStream';
+  async askService(askPrompt: askTextStreamDto) {
+    return new Observable<MessageEvent>((observer) => {
+      askGemini(askPrompt).then(async (result) => {
+        for await (const chunk of result.stream) {
+          observer.next({ data: chunk } as MessageEvent);
+        }
+        observer.complete();
+      });
+    });
   }
 
-  findAll() {
-    return `This action returns all textStream`;
+  // other methods
+
+  create(createTextStreamDto: CreateTextStreamDto) {
+    return 'This action adds a new textStream';
   }
 
   findOne(id: number) {
